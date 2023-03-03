@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: genres-dep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: genres
+  template:
+    metadata:
+      labels:
+        app: genres
+    spec:
+      containers:
+        - name: genres
+          image: genres:latest
+          imagePullPolicy: "Never"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: genres-srv-cl-ip
+spec:
+  selector:
+    app: genres
+  ports:
+    - name: genres
+      protocol: TCP
+      port: 4100
+      targetPort: 4100

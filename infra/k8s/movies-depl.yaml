@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: movies-dep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: movies
+  template:
+    metadata:
+      labels:
+        app: movies
+    spec:
+      containers:
+        - name: movies
+          image: movies:latest
+          imagePullPolicy: "Never"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: movies-srv-cl-ip
+spec:
+  selector:
+    app: movies
+  ports:
+    - name: movies
+      protocol: TCP
+      port: 4101
+      targetPort: 4101
