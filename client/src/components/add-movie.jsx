@@ -50,6 +50,7 @@ export default function AddMovie() {
             title: formData.get("title"),
             imgUrl: formData.get("imgUrl"),
             desc: formData.get("desc"),
+            amount: formData.get("amount"),
             genres: personName
         })
     })
@@ -140,6 +141,14 @@ export default function AddMovie() {
                   label="Description"
                   name="desc"
                   autoComplete="family-name"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  id="amount"
+                  label="Ticket Price (Rs.)"
+                  type="number"
+                  name="amount"
                 />
               </Grid>
               <Grid item xs={12}>

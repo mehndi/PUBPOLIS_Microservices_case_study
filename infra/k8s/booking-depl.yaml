@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: booking-dep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: booking
+  template:
+    metadata:
+      labels:
+        app: booking
+    spec:
+      containers:
+        - name: booking
+          image: booking:latest
+          imagePullPolicy: "Never"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: booking-srv-cl-ip
+spec:
+  selector:
+    app: booking
+  ports:
+    - name: booking
+      protocol: TCP
+      port: 4103
+      targetPort: 4103

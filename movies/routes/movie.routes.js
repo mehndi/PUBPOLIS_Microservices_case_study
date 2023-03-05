@@ -18,10 +18,10 @@ connectToRabbitMQ();
 // ====
 
 router.post('/movies/create', tockenVerify, (req, res) => {
-    const {title, imgUrl, desc, genres} = req.body;
-    console.log('User', req.user.email)
+    const {title, imgUrl, desc, genres, amount} = req.body;
+    console.log('User', {title, imgUrl, desc, genres, amount})
     if (req.user.email != 'admin@admin.com') return res.json({message: 'Please login with admin@admin.com !'});
-    const movie = new MovieModel({title, imgUrl, desc, genres});
+    const movie = new MovieModel({title, imgUrl, desc, genres, amount});
     movie.save((err, result) => {
         if (err) res.status(400).json(err);
         else {

@@ -10,19 +10,30 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 
-export default function Genres() {
+export default function Booking() {
 
-  const [genres, setGenres] = useState([]);
+  const [booking, setBooking] = useState([]);
 
   useEffect(() => {
 
-    fetch('http://pubpolis.com/getcatalog')
+    fetch('http://pubpolis.com/getbooking', {
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          useremail: localStorage.getItem("useremail")
+        })
+    })
     .then(res => res.json())
     .then(res => {
-      setGenres(res);
+      if (res.message) return;
+      console.log('Bookings', res);
+      setBooking(res);
     }).catch(err => {
-
+        console.log('Error', err);
     });
+
   }, []);
 
   return (
@@ -44,7 +55,7 @@ export default function Genres() {
               color="text.primary"
               gutterBottom
             >
-              Cinema Catalog
+              My Bookings
             </Typography>
           </Container>
         </Box>
@@ -53,26 +64,20 @@ export default function Genres() {
           <Grid container spacing={4}>
 
 
-            {genres.map((card, i) => (
+            {booking.map((card, i) => (
               <Grid item key={i} xs={12} sm={6} md={4}>
                 <Card
                   sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
                 >
-                  <Link href={'/catalog/'+card.title}>
-                  <CardMedia
-                    component="img"
-                    image={card.imgUrl}
-                    alt={card.title}
-                  />
-                  </Link>
                   <CardContent sx={{ flexGrow: 1 }}>
-                    <Typography gutterBottom variant="h5" component="h2">
-                      {card.title}
+                    {card.movie ? <Typography gutterBottom variant="h4" component="h2">
+                      {card.movie.title}</Typography> : ''}
+                    <Typography gutterBottom variant="h6" component="h5">
+                      Date: {card.date}<br/>
+                      Time: {card.time}<br/>
+                      No. of seats: {card.seats}
                     </Typography>
                   </CardContent>
-                  <CardActions>
-                    <Button href={'/catalog/'+card.title} size="small">View</Button>
-                  </CardActions>
                 </Card>
               </Grid>
             ))}

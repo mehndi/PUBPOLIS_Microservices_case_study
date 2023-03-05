@@ -12,6 +12,7 @@ export default function Movies() {
 
   const [movie, setMovie] = useState({});
   const {id} = useParams();
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
 
@@ -73,7 +74,13 @@ export default function Movies() {
                   {movie.amount ? <>Rs {movie.amount}</> : <>Free</>}</strong>
                 <br/>
               </Typography>
-              <BookingForm />
+
+              {token 
+                ? <BookingForm movieid={movie.title} amount={movie.amount} /> 
+                : <Button href="/login" variant="outlined" sx={{ my: 1, mx: 1.5 }}>Login to Book now</Button>
+              }
+              
+              
           </Container>
         </Box>
         <Container sx={{ py: 8 }} maxWidth="md">

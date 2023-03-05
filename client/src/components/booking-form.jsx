@@ -33,7 +33,7 @@ const MenuProps = {
   },
 };
 
-export default function AddMovie() {
+export default function BookingForm(props) {
   const [personName, setPersonName] = React.useState([]);
   const [genresArr, setGenresArr] = useState([]);
 
@@ -47,38 +47,61 @@ export default function AddMovie() {
     setTime(event.target.value);
   };
 
+  const createBooking = (formData, paymentData) => {
+
+    const d = new Date();
+
+    fetch('http://pubpolis.com/booking/create', {
+        method: 'POST',
+        headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${ localStorage.getItem('token') }`
+        },
+        body: JSON.stringify({
+            useremail: localStorage.getItem("useremail"),
+            movieid: props.movieid,
+            seats: formData.get("seats"),
+            paymentid: paymentData._id,
+            date: d.toDateString(),
+            time: formData.get("time")
+        })
+    })
+    .then(res => res.json())
+    .then(res => {
+      if (res.message) return alert(res.message);
+      console.log('Success', res);
+      alert('Booking Done !')
+      window.location.replace('/booking');
+    }).catch(err => {
+        console.log('Error', err);
+    });
+  }
 
   const handleSubmit = (event) => {
     event.preventDefault();
-
-    if (window.confirm(`Are you sure to pay Rs 300 to Pubpolis?`)) {
-      
-    }
+    
     const formData = new FormData(event.currentTarget);
-    // const genres = formData.get("genres").split(',');
 
-    // fetch('http://pubpolis.com/movies/create', {
-    //     method: 'POST',
-    //     headers: { 
-    //         "Content-Type": "application/json",
-    //         "Authorization": `Bearer ${ localStorage.getItem('token') }`
-    //     },
-    //     body: JSON.stringify({
-    //         title: formData.get("title"),
-    //         imgUrl: formData.get("imgUrl"),
-    //         desc: formData.get("desc"),
-    //         genres: personName
-    //     })
-    // })
-    // .then(res => res.json())
-    // .then(res => {
-    //   if (res.message) return alert(res.message);
-    //   alert('New movie added into DB !');
-    //   console.log('Success', res);
-    //   window.location.replace('/');
-    // }).catch(err => {
-    //     console.log('Error', err);
-    // });
+    fetch('http://pubpolis.com/payment/create', {
+        method: 'POST',
+        headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${ localStorage.getItem('token') }`
+        },
+        body: JSON.stringify({
+            amount: formData.get("seats") * props.amount
+        })
+    })
+    .then(res => res.json())
+    .then(res => {
+      if (res.message) return alert(res.message);
+      console.log('Success', res);
+      
+      createBooking(formData, res);
+
+    }).catch(err => {
+        console.log('Error', err);
+    });
   };
 
   const handleChange = (event) => {
@@ -126,10 +149,11 @@ export default function AddMovie() {
               {/* <Grid item xs={12}> */}
               <Grid item xs={12} sm={6}>
                 <FormControl fullWidth>
-                  <InputLabel id="demo-simple-select-label">Seats</InputLabel>
+                  <InputLabel id="seats-label">Seats</InputLabel>
                   <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
+                    labelId="seats-label"
+                    id="seats"
+                    name="seats"
                     value={seats}
                     label="Seats"
                     onChange={handleChangeSeats}
@@ -145,10 +169,11 @@ export default function AddMovie() {
               </Grid>
               <Grid item xs={12} sm={6}>
                 <FormControl fullWidth>
-                  <InputLabel id="demo-simple-select-label">Time</InputLabel>
+                  <InputLabel id="time-label">Time</InputLabel>
                   <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
+                    labelId="time-label"
+                    id="time"
+                    name="time"
                     value={time}
                     label="Time"
                     onChange={handleChangeTime}

@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from './components/layout';
 import NoPage from './components/404';
 import Genres from './components/genres';
+import Booking from './components/booking';
 import AddGenres from './components/add-genres';
 import Movie from './components/movie';
 import Movies from './components/movies';
@@ -23,6 +24,7 @@ export default function App() {
           <Route path="catalog/:id" element={<Movies />} />
           <Route path="catalog/movies/:id" element={<Movie />} />
           <Route path="add-movie" element={<AddMovie />} />
+          <Route path="booking" element={<Booking />} />
           <Route path="register" element={<Register />} />
           <Route path="login" element={<Login />} />
           <Route path="*" element={<NoPage />} />

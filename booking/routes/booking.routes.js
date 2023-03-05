@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const amqp = require('amqplib');
-const GenresModel = require('../models/genres.model')
+const BookingModel = require('../models/booking.model');
+const secretKey = 'OurSecretKey';
+const tockenVerify = require('tokenverify_middleware')(secretKey);
 
 var channel, connection;
 // ==== RabbitMQ Connection
@@ -9,55 +11,46 @@ async function connectToRabbitMQ() {
     const amqpServer = process.env.AMQP_SERVER_PATH;
     connection = await amqp.connect(amqpServer);
     channel = await connection.createChannel();
-    await channel.assertQueue("genres-queue");
-    await channel.assertQueue("movie-queue");
+    await channel.assertQueue("payment-queue");
     console.log(process.env.SERVICE, 'RabbitMQ connected !');
 }
-connectToRabbitMQ().then(() => {
-    channel.consume('genres-queue', data => {
-        const {genres} = JSON.parse(data.content);
-        console.log("Received ", genres);
-        const newGenes = new GenresModel({
-            ...genres,
-            movies: []
-        });
-        newGenes.save();
-        channel.ack(data);
-    });
+connectToRabbitMQ();
 
-    channel.consume('movie-queue', data => {
-        const movie = JSON.parse(data.content);
-        const {genres} = movie;
-        // console.log("Received ", genres);
-        genres.forEach(item => {
-            (async () => {
-                let genresItem = await GenresModel.findOne({ title: item });
-                if (genresItem) {
-                    await GenresModel.updateOne(
-                        { title: item },
-                        { $push: { movies: movie } },
-                    );
-                }
-            })();
-        });
-
-        channel.ack(data);
-    });
-
-});
 // ====
-router.get('/getcatalog/:title', async (req, res) => {
+router.post('/booking/create', tockenVerify, (req, res) => {
+    const {useremail, movieid, seats, paymentid, date, time} = req.body;
+    const booking = new BookingModel({useremail, movieid, seats, paymentid, date, time});
+    booking.save((err, result) => {
+        if (err) res.status(400).json(err);
+        else {
+            channel.sendToQueue(
+                'booking-queue', 
+                Buffer.from(JSON.stringify(booking))
+            );
+            channel.sendToQueue(
+                'booking-notification-queue', 
+                Buffer.from(JSON.stringify({
+                    useremail,
+                    message: 'Booking is done !'
+                }))
+            );
+            res.status(201).json(result);
+        }
+    });
+});
+
+router.get('/booking/:userid', async (req, res) => {
     try {
-        const genres = await GenresModel.findOne({title: req.params.title});
-        return res.status(200).json(genres);
+        const booking = await BookingModel.findOne({userid: req.params.userid});
+        return res.status(200).json(booking);
     } catch (err) {
         return res.status(500).json({message: `Server error !`});
     }
 });
 
-router.get('/getcatalog', async (req, res) => {
-    const catalog = await GenresModel.find({});
-    if (catalog) return res.status(200).json(catalog);
+router.get('/booking', async (req, res) => {
+    const booking = await BookingModel.find({});
+    if (booking) return res.status(200).json(booking);
     else return res.status(500).json({message: `Server error !`});
 });
 

@@ -38,7 +38,35 @@ spec:
                 name: genres-srv-cl-ip
                 port:
                   number: 4100
+          - path: /booking
+            pathType: Prefix
+            backend:
+              service:
+                name: booking-srv-cl-ip
+                port:
+                  number: 4103
+          - path: /payment
+            pathType: Prefix
+            backend:
+              service:
+                name: payment-srv-cl-ip
+                port:
+                  number: 4104
+          - path: /notification
+            pathType: Prefix
+            backend:
+              service:
+                name: notification-srv-cl-ip
+                port:
+                  number: 4105
           - path: /getcatalog
+            pathType: Prefix
+            backend:
+              service:
+                name: query-srv-cl-ip
+                port:
+                  number: 4109
+          - path: /getbooking
             pathType: Prefix
             backend:
               service:

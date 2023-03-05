@@ -33,10 +33,12 @@ export default function Login() {
         console.log( res );
         let token = res.token;
         let name = (res.user) ? res.user.name : '';
+        let useremail = (res.user) ? res.user.email : '';
         if (!token) return alert(res.message);
         
         localStorage.setItem('token', token);
         localStorage.setItem('user', name);
+        localStorage.setItem('useremail', useremail);
         alert('User Logged In !');
         window.location.replace('/');
         console.log( token );

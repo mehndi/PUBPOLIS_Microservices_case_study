@@ -29,6 +29,7 @@ function HomeContent() {
 
   const handleLogout = () => {
     localStorage.removeItem('user');
+    localStorage.removeItem('useremail');
     localStorage.removeItem('token');
     window.location.replace('/login');
   }
@@ -81,7 +82,15 @@ function HomeContent() {
             sx={{ bgcolor: 'orange' }}
             alt={currentUser}
             src=""
-          />{currentUser} <Button onClick={handleLogout} variant="outlined" sx={{ my: 1, mx: 1.5 }}>Logout</Button></>
+          />{currentUser} <Button onClick={handleLogout} variant="outlined" sx={{ my: 1, mx: 1.5 }}>Logout</Button>
+          <Link
+              variant="button"
+              color="text.primary"
+              href="/booking"
+              sx={{ my: 1, mx: 1.5 }}
+            >
+              Bookings
+            </Link></>
             : <Button href="/login" variant="outlined" sx={{ my: 1, mx: 1.5 }}>Login</Button>
           }
           
